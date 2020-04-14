@@ -109,6 +109,8 @@ bool cliMode = false;
 #include "flight/position.h"
 #include "flight/servos.h"
 
+#include "flow/flow.h"
+
 #include "io/asyncfatfs/asyncfatfs.h"
 #include "io/beeper.h"
 #include "io/flashfs.h"
@@ -2579,6 +2581,24 @@ static void cliFlashRead(const char *cmdName, char *cmdline)
 
 #endif
 #endif
+
+static void cliFlow(const char *cmdName, char *cmdline)
+{
+    int i;
+    int count;
+
+    if (!isEmpty(cmdline)) {
+        cliShowInvalidArgumentCountError(cmdName);
+        return;
+    }
+
+    cliPrintLinef("Flow node configs:");
+    count = flowGetNodeConfigCount();
+    for(i=0; i<count; i++) {
+        const flowNodeConfig_t *node = flowGetNodeConfig(i);
+        cliPrintLinef("%3d: %16s - in:%3d out:%3d params:%3d", i, node->ident, node->num_in, node->num_out, node->num_params);
+    }
+}
 
 #ifdef USE_VTX_CONTROL
 static void printVtx(dumpFlags_t dumpMask, const vtxConfig_t *vtxConfig, const vtxConfig_t *vtxConfigDefault, const char *headingStr)
@@ -6420,6 +6440,7 @@ const clicmd_t cmdTable[] = {
     CLI_COMMAND_DEF("flash_scan", "scan flash device for errors", NULL, cliFlashVerify),
     CLI_COMMAND_DEF("flash_write", NULL, "<address> <message>", cliFlashWrite),
 #endif
+    CLI_COMMAND_DEF("flow", NULL, "show or edit flow configuration", cliFlow),
 #endif
     CLI_COMMAND_DEF("get", "get variable value", "[name]", cliGet),
 #ifdef USE_GPS

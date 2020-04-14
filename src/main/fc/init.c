@@ -98,6 +98,8 @@
 #include "flight/rpm_filter.h"
 #include "flight/servos.h"
 
+#include "flow/flow.h"
+
 #include "io/asyncfatfs/asyncfatfs.h"
 #include "io/beeper.h"
 #include "io/dashboard.h"
@@ -1034,6 +1036,8 @@ void init(void)
     swdPinsInit();
 
     unusedPinsInit();
+
+    flowInit();
 
     tasksInit();
 

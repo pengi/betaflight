@@ -140,6 +140,13 @@ SECTIONS
     KEEP (*(.pg_resetdata))
     PROVIDE_HIDDEN (__pg_resetdata_end = .);
   } >CODE_RAM
+  .flow_node_config :
+  {
+    PROVIDE_HIDDEN (__flow_nodeconfig_start = .);
+    KEEP (*(.flow_node_config))
+    KEEP (*(SORT(.flow_node_config.*)))
+    PROVIDE_HIDDEN (__flow_nodeconfig_end = .);
+  } >CODE_RAM
 
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);

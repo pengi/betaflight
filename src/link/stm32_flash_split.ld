@@ -115,6 +115,13 @@ SECTIONS
     KEEP (*(.pg_resetdata))
     PROVIDE_HIDDEN (__pg_resetdata_end = .);
   } >FLASH
+  .flow_node_config :
+  {
+    PROVIDE_HIDDEN (__flow_nodeconfig_start = .);
+    KEEP (*(.flow_node_config))
+    KEEP (*(SORT(.flow_node_config.*)))
+    PROVIDE_HIDDEN (__flow_nodeconfig_end = .);
+  } >FLASH
 
   /* Storage for the address for the configuration section so we can grab it out of the hex file */
   .custom_defaults :

@@ -91,6 +91,15 @@ SECTIONS
     KEEP (*(.pg_resetdata))
     PROVIDE_HIDDEN (__pg_resetdata_end = .);
   } >FLASH AT >AXIM_FLASH
+  
+  .flow_node_config :
+  {
+    . = ALIGN(4);
+    PROVIDE_HIDDEN (__flow_node_config_start = .);
+    KEEP (*(.flow_node_config))
+    KEEP (*(SORT(.flow_node_config.*)))
+    PROVIDE_HIDDEN (__flow_node_config_end = .);
+  } >FLASH AT >AXIM_FLASH
 
   /* Storage for the address for the configuration section so we can grab it out of the hex file */
   .custom_defaults :
