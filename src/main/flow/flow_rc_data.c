@@ -2,7 +2,9 @@
 #include "flow/flow_config.h"
 #include "rx/rx.h"
 
+static void flow_node_rx_input(flowValue_t *regs, const flowStep_t *step);
 FLOW_NODE_CONFIG("rx_input", flow_node_rx_input, 1, FLOW_MAX_ARGS);
+
 void flow_node_rx_input(flowValue_t *regs, const flowStep_t *step)
 {
     uint16_t i;
