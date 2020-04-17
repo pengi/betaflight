@@ -100,6 +100,7 @@ COMMON_SRC = \
             flight/rpm_filter.c \
             flight/servos.c \
             flow/flow_common.c \
+            flow/flow_rc_data.c \
             flow/flow.c \
             io/serial_4way.c \
             io/serial_4way_avrootloader.c \
@@ -259,6 +260,7 @@ SPEED_OPTIMISED_SRC := $(SPEED_OPTIMISED_SRC) \
             flight/pid.c \
             flight/rpm_filter.c \
             flow/flow_common.c \
+            flow/flow_rc_data.c \
             flow/flow.c \
             rx/ibus.c \
             rx/rx.c \

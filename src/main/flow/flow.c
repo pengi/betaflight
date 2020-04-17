@@ -36,6 +36,7 @@ void flowInit(void)
     int i;
 
     program_length = 0;
+    program[program_length++] = flowGetNodeConfigByName("rx_input");
     program[program_length++] = flowGetNodeConfigByName("servo_output");
 
     for(i=0; i<program_length; i++) {
