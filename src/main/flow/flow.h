@@ -2,8 +2,10 @@
 
 #include <stdint.h>
 
+#include "common/time.h"
+#include "scheduler/scheduler.h"
+
 typedef union {
-    int32_t i32;
     float f32;
 } flowValue_t;
 
@@ -32,6 +34,8 @@ typedef struct {
     /**/
 
 void flowInit(void);
+void flowUpdate(timeUs_t currentTimeUs);
 
-const flowNodeConfig_t *flowGetNodeConfig(int index);
+const flowNodeConfig_t *flowGetNodeConfigByIndex(int index);
+const flowNodeConfig_t *flowGetNodeConfigByName(const char *name);
 int flowGetNodeConfigCount();

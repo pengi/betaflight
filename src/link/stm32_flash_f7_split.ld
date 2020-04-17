@@ -99,7 +99,7 @@ SECTIONS
     KEEP (*(.flow_node_config))
     KEEP (*(SORT(.flow_node_config.*)))
     PROVIDE_HIDDEN (__flow_node_config_end = .);
-  } >FLASH AT >AXIM_FLASH
+  } >FLASH1 AT >AXIM_FLASH1
 
   /* Storage for the address for the configuration section so we can grab it out of the hex file */
   .custom_defaults :

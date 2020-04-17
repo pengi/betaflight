@@ -758,12 +758,7 @@ void init(void)
 
 #ifdef USE_SERVOS
     servosInit();
-    servoConfigureOutput();
-    if (isMixerUsingServos()) {
-        //pwm_params.useChannelForwarding = featureIsEnabled(FEATURE_CHANNEL_FORWARDING);
-        servoDevInit(&servoConfig()->dev);
-    }
-    servosFilterInit();
+    servoDevInit(&servoConfig()->dev);
 #endif
 
 #ifdef USE_PINIO
@@ -1037,9 +1032,9 @@ void init(void)
 
     unusedPinsInit();
 
-    flowInit();
-
     tasksInit();
+
+    flowInit();
 
     systemState |= SYSTEM_STATE_READY;
 }

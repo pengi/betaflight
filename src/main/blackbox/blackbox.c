@@ -64,7 +64,6 @@
 #include "flight/mixer.h"
 #include "flight/pid.h"
 #include "flight/rpm_filter.h"
-#include "flight/servos.h"
 
 #include "io/beeper.h"
 #include "io/gps.h"
@@ -236,10 +235,7 @@ static const blackboxDeltaFieldDefinition_t blackboxMainFields[] = {
     {"motor",       4, UNSIGNED, .Ipredict = PREDICT(MOTOR_0), .Iencode = ENCODING(SIGNED_VB),   .Ppredict = PREDICT(AVERAGE_2),     .Pencode = ENCODING(SIGNED_VB), CONDITION(AT_LEAST_MOTORS_5)},
     {"motor",       5, UNSIGNED, .Ipredict = PREDICT(MOTOR_0), .Iencode = ENCODING(SIGNED_VB),   .Ppredict = PREDICT(AVERAGE_2),     .Pencode = ENCODING(SIGNED_VB), CONDITION(AT_LEAST_MOTORS_6)},
     {"motor",       6, UNSIGNED, .Ipredict = PREDICT(MOTOR_0), .Iencode = ENCODING(SIGNED_VB),   .Ppredict = PREDICT(AVERAGE_2),     .Pencode = ENCODING(SIGNED_VB), CONDITION(AT_LEAST_MOTORS_7)},
-    {"motor",       7, UNSIGNED, .Ipredict = PREDICT(MOTOR_0), .Iencode = ENCODING(SIGNED_VB),   .Ppredict = PREDICT(AVERAGE_2),     .Pencode = ENCODING(SIGNED_VB), CONDITION(AT_LEAST_MOTORS_8)},
-
-    /* Tricopter tail servo */
-    {"servo",       5, UNSIGNED, .Ipredict = PREDICT(1500),    .Iencode = ENCODING(SIGNED_VB),   .Ppredict = PREDICT(PREVIOUS),      .Pencode = ENCODING(SIGNED_VB), CONDITION(TRICOPTER)}
+    {"motor",       7, UNSIGNED, .Ipredict = PREDICT(MOTOR_0), .Iencode = ENCODING(SIGNED_VB),   .Ppredict = PREDICT(AVERAGE_2),     .Pencode = ENCODING(SIGNED_VB), CONDITION(AT_LEAST_MOTORS_8)}
 };
 
 #ifdef USE_GPS
@@ -304,7 +300,6 @@ typedef struct blackboxMainState_s {
     int16_t accADC[XYZ_AXIS_COUNT];
     int16_t debug[DEBUG16_VALUE_COUNT];
     int16_t motor[MAX_SUPPORTED_MOTORS];
-    int16_t servo[MAX_SUPPORTED_SERVOS];
 
     uint16_t vbatLatest;
     int32_t amperageLatest;
@@ -613,11 +608,6 @@ static void writeIntraframe(void)
         blackboxWriteSignedVB(blackboxCurrent->motor[x] - blackboxCurrent->motor[0]);
     }
 
-    if (testBlackboxCondition(FLIGHT_LOG_FIELD_CONDITION_TRICOPTER)) {
-        //Assume the tail spends most of its time around the center
-        blackboxWriteSignedVB(blackboxCurrent->servo[5] - 1500);
-    }
-
     //Rotate our history buffers:
 
     //The current state becomes the new "before" state
@@ -743,10 +733,6 @@ static void writeInterframe(void)
         blackboxWriteMainStateArrayUsingAveragePredictor(offsetof(blackboxMainState_t, debug), DEBUG16_VALUE_COUNT);
     }
     blackboxWriteMainStateArrayUsingAveragePredictor(offsetof(blackboxMainState_t, motor),     getMotorCount());
-
-    if (testBlackboxCondition(FLIGHT_LOG_FIELD_CONDITION_TRICOPTER)) {
-        blackboxWriteSignedVB(blackboxCurrent->servo[5] - blackboxLast->servo[5]);
-    }
 
     //Rotate our history buffers
     blackboxHistory[2] = blackboxHistory[1];
@@ -1061,10 +1047,6 @@ static void loadMainState(timeUs_t currentTimeUs)
 
     blackboxCurrent->rssi = getRssi();
 
-#ifdef USE_SERVOS
-    //Tail servo for tricopters
-    blackboxCurrent->servo[5] = servo[5];
-#endif
 #else
     UNUSED(currentTimeUs);
 #endif // UNIT_TEST

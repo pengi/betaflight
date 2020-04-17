@@ -99,7 +99,6 @@ COMMON_SRC = \
             flight/pid.c \
             flight/rpm_filter.c \
             flight/servos.c \
-            flight/servos_tricopter.c \
             flow/flow_common.c \
             flow/flow.c \
             io/serial_4way.c \

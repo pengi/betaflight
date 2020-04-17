@@ -70,14 +70,12 @@
 #include "flight/pid.h"
 #include "flight/position.h"
 #include "flight/rpm_filter.h"
-#include "flight/servos.h"
 
 #include "io/beeper.h"
 #include "io/gps.h"
 #include "io/motors.h"
 #include "io/pidaudio.h"
 #include "io/serial.h"
-#include "io/servos.h"
 #include "io/statusindicator.h"
 #include "io/transponder_ir.h"
 #include "io/vtx_control.h"
@@ -1191,13 +1189,6 @@ static FAST_CODE void subTaskMotorUpdate(timeUs_t currentTimeUs)
 
     mixTable(currentTimeUs, currentPidProfile->vbatPidCompensation);
 
-#ifdef USE_SERVOS
-    // motor outputs are used as sources for servo mixing, so motors must be calculated using mixTable() before servos.
-    if (isMixerUsingServos()) {
-        writeServos();
-    }
-#endif
-
     writeMotors();
 
 #ifdef USE_DSHOT_TELEMETRY_STATS
@@ -1219,12 +1210,8 @@ static FAST_CODE_NOINLINE void subTaskRcCommand(timeUs_t currentTimeUs)
     // If we're armed, at minimum throttle, and we do arming via the
     // sticks, do not process yaw input from the rx.  We do this so the
     // motors do not spin up while we are trying to arm or disarm.
-    // Allow yaw control for tricopters if the user wants the servo to move even when unarmed.
     if (isUsingSticksForArming() && rcData[THROTTLE] <= rxConfig()->mincheck
 #ifndef USE_QUAD_MIXER_ONLY
-#ifdef USE_SERVOS
-                && !((mixerConfig()->mixerMode == MIXER_TRI || mixerConfig()->mixerMode == MIXER_CUSTOM_TRI) && servoConfig()->tri_unarmed_servo)
-#endif
                 && mixerConfig()->mixerMode != MIXER_AIRPLANE
                 && mixerConfig()->mixerMode != MIXER_FLYING_WING
 #endif

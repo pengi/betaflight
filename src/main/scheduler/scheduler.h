@@ -73,6 +73,7 @@ typedef enum {
     TASK_GYRO,
     TASK_FILTER,
     TASK_PID,
+    TASK_FLOW,
     TASK_ACCEL,
     TASK_ATTITUDE,
     TASK_RX,
