@@ -36,6 +36,7 @@
 #include "common/axis.h"
 #include "common/color.h"
 #include "common/maths.h"
+#include "common/mem.h"
 #include "common/printf_serial.h"
 
 #include "config/config_eeprom.h"
@@ -314,6 +315,8 @@ void init(void)
 #endif
 
     systemInit();
+
+    memInit();
 
     // initialize IO (needed for all IO operations)
     IOInitGlobal();
