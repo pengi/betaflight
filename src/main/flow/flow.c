@@ -1,71 +1,49 @@
 #include "flow/flow.h"
+#include "flow/flow_config.h"
+#include "common/mem.h"
 #include "common/time.h"
+#include "scheduler/scheduler.h"
 
 #include <string.h>
 
-extern const flowNodeConfig_t __flow_node_config_start[];
-extern const flowNodeConfig_t __flow_node_config_end[];
+#define FLOW_NUM_VARS 64
+#define FLOW_NUM_STEPS 64
 
+static flowContext_t ctx;
 
-static const flowNodeConfig_t *program[8];
-static int program_length;
-
-const flowNodeConfig_t *flowGetNodeConfigByIndex(int index)
-{
-    return &__flow_node_config_start[index];
-}
-
-const flowNodeConfig_t *flowGetNodeConfigByName(const char *name)
-{
-    const flowNodeConfig_t *cur;
-    for(cur = __flow_node_config_start; cur < __flow_node_config_end; cur++) {
-        if(0==strcmp(cur->ident, name)) {
-            return cur;
-        }
-    }
-    return NULL;
-}
-
-int flowGetNodeConfigCount()
-{
-    return __flow_node_config_end - __flow_node_config_start;
-}
+const char * const program[] = {
+    "rx_input 0 1 2 3",
+    "add 4 0 2",
+    "add 5 1 3",
+    "servo_output 4 5",
+    NULL
+};
 
 void flowInit(void)
 {
+    char tmpline[128];
     int i;
+    ctx.max_vars = FLOW_NUM_VARS;
+    ctx.max_steps = FLOW_NUM_STEPS;
+    ctx.num_steps = 0;
 
-    program_length = 0;
-    program[program_length++] = flowGetNodeConfigByName("rx_input");
-    program[program_length++] = flowGetNodeConfigByName("servo_output");
+    ctx.vars = memAlloc(sizeof(flowValue_t)*ctx.max_vars);
+    ctx.steps = memAlloc(sizeof(flowStep_t)*ctx.max_steps);
 
-    for(i=0; i<program_length; i++) {
-        if(program[i] == NULL) {
-            /* Not a complete program, bail out */
+    for(i=0; program[i] != NULL; i++) {
+        strcpy(tmpline, program[i]);
+        if(!flowConfigBuildStep(&ctx, tmpline)) {
             return;
         }
     }
+
     setTaskEnabled(TASK_FLOW, true);
 }
 
 void flowUpdate(timeUs_t currentTimeUs) {
-    int i,j;
-    flowValue_t input[8];
-    flowValue_t output[8];
-    flowValue_t params[8];
-
+    int i;
     (void)currentTimeUs;
-
-    for(j=0; j<8; j++) {
-        params[i].f32 = 0.5f;
-        input[i].f32 = 0.5f;
-    }
-
-    for(i=0; i<program_length; i++) {
-        program[i]->handler(output, input, params);
-
-        for(j=0; j<8; j++) {
-            input[j] = output[j];
-        }
+    for(i=0; i<ctx.num_steps; i++) {
+        ctx.steps[i].handler(ctx.vars, &ctx.steps[i]);
     }
 }

@@ -1,13 +1,12 @@
 #include "flow/flow.h"
+#include "flow/flow_config.h"
 #include "rx/rx.h"
 
-FLOW_NODE_CONFIG("rx_input", flow_node_rx_input, 0, 8, 0);
-void flow_node_rx_input(flowValue_t *outputs, const flowValue_t *inputs, const flowValue_t *params)
+FLOW_NODE_CONFIG("rx_input", flow_node_rx_input, 1, FLOW_MAX_ARGS);
+void flow_node_rx_input(flowValue_t *regs, const flowStep_t *step)
 {
-    int i;
-    (void)inputs;
-    (void)params;
-    for(i=0; i<8; i++) {
-        outputs[i].f32 = (rcData[i] - 1500) / 500.0f;
+    uint16_t i;
+    for(i=0; i<step->num_args; i++) {
+        regs[step->args[i]].f32 = (rcData[i] - 1500) / 500.0f;
     }
 }

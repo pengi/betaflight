@@ -109,7 +109,7 @@ bool cliMode = false;
 #include "flight/position.h"
 #include "flight/servos.h"
 
-#include "flow/flow.h"
+#include "flow/flow_config.h"
 
 #include "io/asyncfatfs/asyncfatfs.h"
 #include "io/beeper.h"
@@ -2414,10 +2414,10 @@ static void cliFlow(const char *cmdName, char *cmdline)
     }
 
     cliPrintLinef("Flow node configs:");
-    count = flowGetNodeConfigCount();
+    count = flowConfigGetCount();
     for(i=0; i<count; i++) {
-        const flowNodeConfig_t *node = flowGetNodeConfigByIndex(i);
-        cliPrintLinef("%3d: %16s - in:%3d out:%3d params:%3d", i, node->ident, node->num_in, node->num_out, node->num_params);
+        const flowNodeConfig_t *node = flowConfigGetByIndex(i);
+        cliPrintLinef("%3d: %16s - min params:%3d max params:%3d", i, node->ident, node->min_params, node->max_params);
     }
 }
 

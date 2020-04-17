@@ -36,6 +36,7 @@
 #include "flight/servos.h"
 
 #include "flow/flow.h"
+#include "flow/flow_config.h"
 
 #include "pg/pg.h"
 #include "pg/pg_ids.h"
@@ -78,18 +79,17 @@ void servosInit(void)
 {
 }
 
-FLOW_NODE_CONFIG("servo_output", flow_servo_output, 8, 0, 0);
-void flow_servo_output(flowValue_t *outputs, const flowValue_t *inputs, const flowValue_t *params)
+FLOW_NODE_CONFIG("servo_output", flow_servo_output, 1, MAX_SUPPORTED_SERVOS);
+void flow_servo_output(flowValue_t *regs, const flowStep_t *step)
 {
-    (void)outputs;
-    (void)params;
-    for (uint8_t i = 0; i < MAX_SUPPORTED_SERVOS; i++) {
+    for (uint8_t i = 0; i < step->num_args; i++) {
         const servoParam_t *param = servoParams(i);
+        float in_val = regs[step->args[i]].f32;
         int16_t value;
-        if(inputs[i].f32 < 0.0f) {
-            value = param->middle - (int16_t)(inputs[i].f32 * (param->min - param->middle));
+        if(in_val < 0.0f) {
+            value = param->middle - (int16_t)(in_val * (param->min - param->middle));
         } else {
-            value = param->middle + (int16_t)(inputs[i].f32 * (param->max - param->middle));
+            value = param->middle + (int16_t)(in_val * (param->max - param->middle));
         }
         pwmWriteServo(i, constrain(value, param->min, param->max));
     }

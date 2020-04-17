@@ -1,21 +1,24 @@
 #include "flow/flow.h"
+#include "flow/flow_config.h"
 
-FLOW_NODE_CONFIG("const", flow_node_in_const, 0, 1, 1);
-void flow_node_in_const(flowValue_t *outputs, const flowValue_t *inputs, const flowValue_t *params)
+FLOW_NODE_CONFIG("mult", flow_node_mult_f, 2, FLOW_MAX_ARGS);
+void flow_node_mult_f(flowValue_t *regs, const flowStep_t *step)
 {
-    (void)inputs;
-    outputs[0] = params[0];
+    int i;
+    float out = 1.0f;
+    for(i=1; i<step->num_args; i++) {
+        out *= regs[step->args[i]].f32;
+    }
+    regs[step->args[0]].f32 = out;
 }
 
-FLOW_NODE_CONFIG("mult_f", flow_node_mult_f, 1, 2, 0);
-void flow_node_mult_f(flowValue_t *outputs, const flowValue_t *inputs, const flowValue_t *params)
+FLOW_NODE_CONFIG("add", flow_node_add_f, 2, FLOW_MAX_ARGS);
+void flow_node_add_f(flowValue_t *regs, const flowStep_t *step)
 {
-    (void)params;
-    outputs[0].f32 = inputs[0].f32 * inputs[1].f32;
-}
-
-FLOW_NODE_CONFIG("mult_cf", flow_node_mult_cf, 1, 1, 1);
-void flow_node_mult_cf(flowValue_t *outputs, const flowValue_t *inputs, const flowValue_t *params)
-{
-    outputs[0].f32 = inputs[0].f32 * params[0].f32;
+    int i;
+    float out = 0.0f;
+    for(i=1; i<step->num_args; i++) {
+        out += regs[step->args[i]].f32;
+    }
+    regs[step->args[0]].f32 = out;
 }
